@@ -27,7 +27,7 @@
     body {
       margin: 0;
       color: var(--ink);
-      background: linear-gradient(180deg, #11100b 0 316px, var(--paper) 317px);
+      background: linear-gradient(180deg, #11100b 0 680px, var(--paper) 681px);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
       line-height: 1.5;
     }
@@ -75,9 +75,9 @@
     .main { padding: 34px; }
     .wrap { width: min(1120px, 100%); margin: 0 auto; }
     .hidden { display: none !important; }
-    .hero { min-height: calc(100vh - 68px); color: white; display: grid; align-content: center; gap: 24px; }
-    .hero h2 { margin: 0; max-width: 980px; font-size: clamp(40px, 6.4vw, 82px); line-height: .98; letter-spacing: 0; text-wrap: balance; }
-    .hero p { margin: 0; max-width: 760px; color: rgba(255,255,255,.76); font-size: 18px; }
+    .hero { min-height: calc(100vh - 68px); color: white; display: grid; align-content: center; gap: 24px; padding: 34px 0 64px; }
+    .hero h2 { margin: 0; max-width: 920px; font-size: clamp(38px, 5.6vw, 74px); line-height: 1.04; letter-spacing: 0; text-wrap: balance; }
+    .hero p { margin: 0; max-width: 760px; color: #f8efd4; font-size: 18px; text-shadow: 0 1px 0 rgba(0,0,0,.22); }
     .hero-line { display: flex; gap: 10px; flex-wrap: wrap; }
     .chip {
       border: 1px solid rgba(255,255,255,.22);
@@ -90,8 +90,8 @@
     }
     .hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 760px; }
     .metric {
-      border: 1px solid rgba(245,183,0,.24);
-      background: rgba(245,183,0,.08);
+      border: 1px solid rgba(245,183,0,.40);
+      background: rgba(255,250,240,.08);
       border-radius: var(--radius);
       padding: 14px;
       min-height: 86px;
@@ -99,7 +99,7 @@
       align-content: space-between;
     }
     .metric b { color: #ffd84d; font-size: 24px; line-height: 1; }
-    .metric span { color: rgba(255,255,255,.70); font-size: 12px; }
+    .metric span { color: #f4e6be; font-size: 12px; }
     .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .btn {
       border: 0;
