@@ -1,0 +1,4 @@
+source_material.docx
+source_material_extract.txt
+*.xlsx
+.agents/

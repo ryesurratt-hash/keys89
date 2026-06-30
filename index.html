@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Belbin 面试快测</title>
+  <style>
+    :root {
+      --ink: #11100b;
+      --muted: #746f61;
+      --line: #e2d8b8;
+      --paper: #f6efdc;
+      --surface: #fffaf0;
+      --green: #f6c443;
+      --blue: #c89413;
+      --red: #6f4d08;
+      --gold: #f5b700;
+      --teal: #d9a51b;
+      --purple: #8c6a14;
+      --shadow: 0 20px 60px rgba(17, 16, 11, .18);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(17,16,11,.98) 0 300px, transparent 301px),
+        linear-gradient(135deg, rgba(245,183,0,.20), transparent 42%),
+        linear-gradient(315deg, rgba(17,16,11,.10), transparent 38%),
+        var(--paper);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 284px minmax(0, 1fr); }
+    .rail {
+      min-height: 100vh;
+      position: sticky;
+      top: 0;
+      padding: 24px 20px;
+      background: rgba(255,250,240,.88);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; }
+    .mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: var(--ink);
+      color: var(--gold);
+      font-weight: 900;
+    }
+    .brand h1 { margin: 0; font-size: 18px; line-height: 1.15; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+
+    .side-block { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 14px; margin-bottom: 14px; }
+    .side-block strong { display: block; margin-bottom: 8px; }
+    .side-block p { margin: 0; color: var(--muted); font-size: 13px; }
+    .meter { height: 9px; border-radius: 999px; background: #e9ddbd; overflow: hidden; margin: 12px 0 8px; }
+    .meter span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ffd84d, #f5b700, #8c6a14); transition: width .25s ease; }
+    .steps { display: grid; gap: 8px; }
+    .step { display: flex; gap: 9px; align-items: center; color: var(--muted); font-size: 13px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #cfc3a1; }
+    .step.active { color: var(--ink); font-weight: 800; }
+    .step.active .dot { background: var(--green); }
+
+    .main { padding: 34px; }
+    .wrap { width: min(1120px, 100%); margin: 0 auto; }
+    .hidden { display: none !important; }
+    .hero { min-height: calc(100vh - 68px); color: white; display: grid; align-content: center; gap: 24px; }
+    .hero h2 { margin: 0; max-width: 980px; font-size: clamp(42px, 7vw, 88px); line-height: .96; letter-spacing: 0; }
+    .hero p { margin: 0; max-width: 760px; color: rgba(255,255,255,.76); font-size: 18px; }
+    .hero-line { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid rgba(255,255,255,.22);
+      color: rgba(255,255,255,.86);
+      background: rgba(245,183,0,.13);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 750;
+    }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      border: 0;
+      border-radius: var(--radius);
+      min-height: 44px;
+      padding: 11px 16px;
+      background: var(--ink);
+      color: var(--gold);
+      font-weight: 850;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(0,0,0,.14); }
+    .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
+    .btn.warn { background: #6f4d08; color: #fff2b8; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,250,240,.96);
+      box-shadow: var(--shadow);
+    }
+    .setup { padding: 24px; display: grid; gap: 20px; }
+    .screen-title { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+    .screen-title h2 { margin: 0; font-size: clamp(28px, 4vw, 48px); line-height: 1.05; }
+    .screen-title p { margin: 8px 0 0; color: var(--muted); max-width: 680px; }
+    .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 13px; font-weight: 750; }
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 11px 12px;
+      min-height: 44px;
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .quiz { overflow: hidden; }
+    .quiz-head { padding: 20px 24px; border-bottom: 1px solid var(--line); display: grid; gap: 12px; }
+    .quiz-row { display: flex; justify-content: space-between; gap: 14px; color: var(--muted); font-size: 13px; }
+    .quiz-body { padding: 24px; }
+    .tag { display: inline-flex; border-radius: 999px; padding: 6px 10px; background: rgba(245,183,0,.20); color: #6f4d08; font-size: 12px; font-weight: 850; }
+    .question { margin: 14px 0 18px; font-size: clamp(23px, 3.2vw, 34px); line-height: 1.18; }
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .option {
+      width: 100%;
+      min-height: 112px;
+      text-align: left;
+      display: grid;
+      align-content: start;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      padding: 15px;
+    }
+    .option:hover, .option.selected { border-color: rgba(245,183,0,.85); box-shadow: 0 10px 24px rgba(140,106,20,.16); }
+    .option.selected { background: #fff3bd; }
+    .option b { font-size: 15px; }
+    .option span { color: var(--muted); font-size: 13px; }
+    .quiz-foot { padding: 18px 24px; border-top: 1px solid var(--line); background: rgba(255,255,255,.55); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .hint { color: var(--muted); font-size: 13px; }
+
+    .report { display: none; gap: 16px; }
+    .report.active { display: grid; }
+    .report-hero {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .summary { padding: 24px; background: linear-gradient(135deg, rgba(245,183,0,.24), transparent 52%), var(--surface); }
+    .summary h2 { margin: 6px 0 10px; font-size: clamp(30px, 4.8vw, 58px); line-height: 1; }
+    .summary p { margin: 0; color: #3a3424; font-size: 16px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .badge { border: 1px solid var(--line); border-radius: 999px; background: rgba(245,183,0,.18); padding: 6px 10px; font-size: 12px; font-weight: 800; }
+    .score-panel { padding: 18px; display: grid; place-items: center; }
+    canvas { max-width: 100%; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .section { padding: 20px; }
+    .section h3 { margin: 0 0 12px; font-size: 18px; }
+    .bar-list { display: grid; gap: 10px; }
+    .bar { display: grid; grid-template-columns: 104px 1fr 40px; gap: 10px; align-items: center; font-size: 13px; }
+    .bar-track { height: 9px; border-radius: 999px; background: #e9ddbd; overflow: hidden; }
+    .bar-fill { height: 100%; width: 0; border-radius: 999px; background: var(--green); }
+    .list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+    .list li { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 10px 11px; color: #3a3424; font-size: 14px; }
+    .role-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 14px; display: grid; gap: 8px; }
+    .role-card h4 { margin: 0; font-size: 16px; }
+    .role-card p { margin: 0; color: var(--muted); font-size: 13px; }
+    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .copy-box { width: 100%; min-height: 190px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 12px; white-space: pre-wrap; color: #3a3424; font-size: 13px; }
+    .print-only { display: none; }
+
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .rail { position: static; min-height: auto; }
+      .main { padding: 20px; }
+      .hero { min-height: auto; padding: 32px 0; }
+      .form-grid, .options, .report-hero, .grid-2, .role-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: white; }
+      .rail, .actions, .quiz-foot, .no-print { display: none !important; }
+      .app, .report-hero, .grid-2 { display: block; }
+      .main { padding: 0; }
+      .panel { box-shadow: none; break-inside: avoid; margin-bottom: 12px; }
+      .print-only { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand">
+        <div class="mark">B</div>
+        <div>
+          <h1>Belbin 面试快测</h1>
+          <p>5 分钟角色倾向筛查</p>
+        </div>
+      </div>
+      <div class="side-block">
+        <strong id="timer">00:00</strong>
+        <div class="meter"><span id="sideProgress"></span></div>
+        <p id="sideStatus">未开始</p>
+      </div>
+      <div class="side-block">
+        <strong>流程</strong>
+        <div class="steps">
+          <div class="step active" id="stepStart"><span class="dot"></span>候选人信息</div>
+          <div class="step" id="stepQuiz"><span class="dot"></span>20 道情境题</div>
+          <div class="step" id="stepReport"><span class="dot"></span>即时面试结论</div>
+        </div>
+      </div>
+      <div class="side-block">
+        <strong>说明</strong>
+        <p>这是面向招聘初筛的简版角色倾向工具，不是 Belbin 官方量表。建议结合履历、行为面试和试岗任务使用。</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="wrap">
+        <section id="homeScreen" class="hero">
+          <div class="hero-line">
+            <span class="chip">面试场景</span>
+            <span class="chip">约 5 分钟</span>
+            <span class="chip">即时生成追问</span>
+          </div>
+          <h2>快速判断候选人在团队里自然会补哪一块。</h2>
+          <p>使用你提供的 20 道工作情境题，每题可选 1-2 项，输出候选人的主导团队角色、适配岗位环境、可能短板和下一轮面试验证点。</p>
+          <div class="actions">
+            <button class="btn" id="homeStart">开始快测</button>
+            <button class="btn secondary" id="sampleBtn">查看示例报告</button>
+          </div>
+        </section>
+
+        <section id="setupScreen" class="panel setup hidden">
+          <div class="screen-title">
+            <div>
+              <h2>候选人信息</h2>
+              <p>这些信息只用于生成报告标题和岗位建议，本地浏览器内运行，不会上传。</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <label>候选人
+              <input id="candidateName" placeholder="例如：张三" />
+            </label>
+            <label>面试岗位
+              <input id="targetRole" placeholder="例如：产品经理" />
+            </label>
+            <label>面试官
+              <input id="interviewer" placeholder="例如：Alice" />
+            </label>
+          </div>
+          <div class="actions">
+            <button class="btn" id="startQuiz">进入测试</button>
+            <button class="btn secondary" id="backHome">返回首页</button>
+          </div>
+        </section>
+
+        <section id="quizScreen" class="panel quiz hidden">
+          <div class="quiz-head">
+            <div class="quiz-row">
+              <span id="progressText">第 1 / 20 题</span>
+              <span id="timeText">建议总时长 5 分钟内</span>
+            </div>
+            <div class="meter"><span id="quizProgress"></span></div>
+          </div>
+          <div class="quiz-body">
+            <span class="tag" id="questionTag">启动阶段</span>
+            <h2 class="question" id="questionText"></h2>
+            <div class="options" id="options"></div>
+          </div>
+          <div class="quiz-foot">
+            <button class="btn secondary" id="prevBtn">上一题</button>
+            <span class="hint" id="quizHint">每题选择 1-2 项，按真实行为作答。</span>
+            <button class="btn" id="nextBtn">下一题</button>
+          </div>
+        </section>
+
+        <section id="reportScreen" class="report">
+          <div class="report-hero">
+            <div class="panel summary">
+              <span class="tag" id="reportMeta">快测报告</span>
+              <h2 id="reportTitle">团队角色倾向</h2>
+              <p id="reportIntro"></p>
+              <div class="badges" id="reportBadges"></div>
+              <div class="actions no-print" style="margin-top:18px">
+                <button class="btn" id="copyBtn">复制面试记录</button>
+                <button class="btn secondary" id="printBtn">打印 / 导出 PDF</button>
+                <button class="btn secondary" id="restartBtn">重新测试</button>
+              </div>
+            </div>
+            <div class="panel score-panel">
+              <canvas id="roleChart" width="360" height="300" aria-label="角色得分图"></canvas>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="panel section">
+              <h3>角色得分</h3>
+              <div class="bar-list" id="scoreBars"></div>
+            </div>
+            <div class="panel section">
+              <h3>面试结论</h3>
+              <ul class="list" id="verdictList"></ul>
+            </div>
+          </div>
+
+          <div class="panel section">
+            <h3>前三角色解释</h3>
+            <div class="role-grid" id="topRoles"></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="panel section">
+              <h3>建议追问</h3>
+              <ul class="list" id="probeList"></ul>
+            </div>
+            <div class="panel section">
+              <h3>适配与风险</h3>
+              <ul class="list" id="riskList"></ul>
+            </div>
+          </div>
+
+          <div class="panel section no-print">
+            <h3>可复制记录</h3>
+            <div class="copy-box" id="copyText"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const roles = {
+      PL: {
+        name: "智多星",
+        en: "Plant",
+        color: "#f5b700",
+        value: "提出新想法，善于从非线性角度破题。",
+        watch: "可能跳跃、忽略落地细节。",
+        probe: "请讲一个你提出非共识方案并推动验证的例子。"
+      },
+      RI: {
+        name: "资源调查员",
+        en: "Resource Investigator",
+        color: "#d9a51b",
+        value: "对外连接资源，快速发现机会和信息。",
+        watch: "可能热启动很快，后续跟进不足。",
+        probe: "最近一次你主动链接外部资源解决问题，结果如何？"
+      },
+      CO: {
+        name: "协调者",
+        en: "Coordinator",
+        color: "#c89413",
+        value: "澄清目标、分配角色，让团队形成共同节奏。",
+        watch: "可能被误解为离一线执行较远。",
+        probe: "当团队目标不一致时，你通常怎样让大家对齐？"
+      },
+      SH: {
+        name: "鞭策者",
+        en: "Shaper",
+        color: "#8c6a14",
+        value: "在压力下推进，敢于挑战低效和拖延。",
+        watch: "可能显得强势，造成协作摩擦。",
+        probe: "请描述一次你推动别人加速但引发阻力的经历。"
+      },
+      ME: {
+        name: "审议员",
+        en: "Monitor Evaluator",
+        color: "#5f4b1a",
+        value: "冷静判断，识别风险，避免草率决策。",
+        watch: "可能让团队感觉保守或慢热。",
+        probe: "你否决过一个看似很有吸引力的方案吗？依据是什么？"
+      },
+      TW: {
+        name: "凝聚者",
+        en: "Teamworker",
+        color: "#f6c443",
+        value: "维护信任，缓冲冲突，提升团队心理安全。",
+        watch: "可能回避直接冲突和艰难反馈。",
+        probe: "团队出现人际冲突时，你做过什么具体动作？"
+      },
+      IMP: {
+        name: "实干家",
+        en: "Implementer",
+        color: "#a47a10",
+        value: "把想法转成流程、计划和可执行动作。",
+        watch: "可能偏好稳定路径，对临时变化抗拒。",
+        probe: "请讲一个你把混乱需求整理成执行计划的例子。"
+      },
+      CF: {
+        name: "完成者",
+        en: "Completer Finisher",
+        color: "#6f4d08",
+        value: "关注质量、收口和交付前的缺陷。",
+        watch: "可能过度追求完美，影响速度。",
+        probe: "你如何判断一个交付物已经足够好，可以发布？"
+      },
+      SP: {
+        name: "专家",
+        en: "Specialist",
+        color: "#b88a12",
+        value: "提供稀缺专业能力，解决深水区问题。",
+        watch: "可能关注专业深度多于全局协作。",
+        probe: "你最近主动钻研的专业问题是什么，如何转化成业务结果？"
+      }
+    };
+
+    const questions = [
+      {
+        tag: "Q1 新任务启动",
+        text: "接到一个你以前没做过的新任务，负责人只讲了目标，没有讲具体做法。你第一反应通常是：",
+        options: [
+          ["先自己拆步骤，做一个初版让负责人看", { IMP: 3 }],
+          ["先问清楚标准、截止时间、交付格式，避免返工", { CF: 2, ME: 1 }],
+          ["先找类似案例/模板/竞品，看看别人怎么做", { RI: 3 }],
+          ["先跟相关同事聊一圈，确认大家理解是否一致", { CO: 2, TW: 1 }],
+          ["先等负责人再补充细节，不贸然开始", {}]
+        ]
+      },
+      {
+        tag: "Q2 紧急活动",
+        text: "团队临时要做一场活动，时间很紧，很多细节还没定。你更可能：",
+        options: [
+          ["先把物料、人员、时间表这些执行清单列出来", { IMP: 3 }],
+          ["先提出几个让活动更有趣、更吸引人的点子", { PL: 3 }],
+          ["先提醒可能出问题的地方，比如流程断点、用户投诉、现场混乱", { ME: 2, CF: 1 }],
+          ["先主动对接需要配合的人，推动大家动起来", { SH: 2, RI: 1 }],
+          ["先完成别人明确交代给你的部分，不主动扩展", {}]
+        ]
+      },
+      {
+        tag: "Q3 用户反馈",
+        text: "群里用户反馈“这个功能不好用/看不懂”，你通常会：",
+        options: [
+          ["第一时间安抚用户，并问清楚具体卡在哪里", { TW: 3 }],
+          ["把问题整理成记录，发给产品/技术跟进", { IMP: 2, CO: 1 }],
+          ["判断这个问题是不是个别现象，先观察更多反馈", { ME: 3 }],
+          ["直接提出一个改法或话术，推动马上优化", { SH: 2, PL: 1 }],
+          ["觉得这不是自己负责的，等负责人处理", {}]
+        ]
+      },
+      {
+        tag: "Q4 会议发散",
+        text: "开会时大家各讲各的，越聊越散。你更自然的反应是：",
+        options: [
+          ["帮大家把讨论点归纳成几个问题", { CO: 2, ME: 1 }],
+          ["提醒先回到本次会议目标，不要跑题", { CO: 2, SH: 1 }],
+          ["提出一个新想法，帮助大家换个角度看问题", { PL: 3 }],
+          ["观察谁有情绪或分歧，先缓和气氛", { TW: 3 }],
+          ["少说话，等负责人最后拍板", {}]
+        ]
+      },
+      {
+        tag: "Q5 质量取舍",
+        text: "你的工作已经完成80%，但你发现有个细节可能影响最终效果。你会：",
+        options: [
+          ["继续打磨到自己觉得比较稳，再提交", { CF: 3 }],
+          ["先提交当前版本，同时标注这个风险点", { ME: 2, CF: 1 }],
+          ["直接找负责人确认这个细节是否值得继续花时间", { CO: 2, ME: 1 }],
+          ["如果不影响大目标，就先不纠结，保证按时交付", { IMP: 2, SH: 1 }],
+          ["暂时放着，等别人发现再说", {}]
+        ]
+      },
+      {
+        tag: "Q6 进度卡点",
+        text: "同事推进很慢，影响到你的交付。你通常会：",
+        options: [
+          ["主动提醒他，并说明会影响整体进度", { SH: 3 }],
+          ["找负责人协调，避免自己卡住", { CO: 3 }],
+          ["自己先补位，把能推进的部分先做掉", { IMP: 2, CF: 1 }],
+          ["先理解对方是不是遇到困难，帮他一起解决", { TW: 3 }],
+          ["不太好意思催，只能自己等", {}]
+        ]
+      },
+      {
+        tag: "Q7 任务偏好",
+        text: "如果让你在以下任务中选一个，你更愿意负责：",
+        options: [
+          ["把一次活动从流程表、物料、人员到复盘全部落地", { IMP: 3 }],
+          ["设计一个新活动玩法，让用户愿意参与和转发", { PL: 3 }],
+          ["维护用户群，回应问题、带动互动、沉淀反馈", { TW: 2, RI: 1 }],
+          ["检查所有文案、页面、流程，确保少出错", { CF: 3 }],
+          ["研究一个专业主题，整理成团队可用的方法或资料", { SP: 3 }]
+        ]
+      },
+      {
+        tag: "Q8 方案优化",
+        text: "负责人给你一个60分的方案，让你继续优化。你更可能：",
+        options: [
+          ["先看用户/客户最在意哪里，优先改关键点", { RI: 2, ME: 1 }],
+          ["先把结构和逻辑重新理顺", { ME: 2, CO: 1 }],
+          ["加入更有创意、更有传播感的表达", { PL: 3 }],
+          ["逐字逐句检查细节，把错误和不清楚的地方修掉", { CF: 3 }],
+          ["先问负责人到底想要什么风格，不然不敢改", {}]
+        ]
+      },
+      {
+        tag: "Q9 重复工作",
+        text: "团队进入重复性工作阶段，比如每天发内容、回用户、做记录。你更接近：",
+        options: [
+          ["可以接受，只要流程清楚，我能稳定完成", { IMP: 3 }],
+          ["会觉得无聊，希望能不断优化玩法或找新增长点", { PL: 2, RI: 1 }],
+          ["会关注细节，想把标准和质量越做越稳", { CF: 3 }],
+          ["会主动看数据和反馈，找哪些动作有效", { ME: 2, RI: 1 }],
+          ["容易松懈，需要别人经常提醒", {}]
+        ]
+      },
+      {
+        tag: "Q10 无主任务",
+        text: "如果你发现一个任务没人管，但它明显会影响结果，你会：",
+        options: [
+          ["主动先接起来，避免事情掉地上", { IMP: 2, SH: 1 }],
+          ["提醒负责人明确谁负责，不然容易乱", { CO: 3 }],
+          ["先看是不是自己的职责范围，不想越界", { ME: 1 }],
+          ["找相关同事一起补上，而不是一个人扛", { TW: 2, CO: 1 }],
+          ["如果没人安排，就默认不处理", {}]
+        ]
+      },
+      {
+        tag: "Q11 工作价值",
+        text: "你做事情时最在意的是：",
+        options: [
+          ["最终能不能达成目标", { SH: 3 }],
+          ["流程是否清楚、标准是否明确", { IMP: 2, CF: 1 }],
+          ["用户/客户是否感受到价值", { RI: 2, TW: 1 }],
+          ["团队协作是否顺畅", { TW: 2, CO: 1 }],
+          ["细节是否完整、低错误", { CF: 3 }],
+          ["有没有新意和亮点", { PL: 3 }]
+        ]
+      },
+      {
+        tag: "Q12 接受批评",
+        text: "当负责人批评你“这件事做得不够好”时，你通常会：",
+        options: [
+          ["先问清楚差距在哪里，下次怎么达标", { CF: 2, IMP: 1 }],
+          ["心里会难受，但还是会尽快调整", { TW: 2, IMP: 1 }],
+          ["先解释自己当时为什么这样做", { ME: 1 }],
+          ["复盘整个流程，看看哪个环节出问题", { ME: 2, IMP: 1 }],
+          ["直接把结果改好，不太想多聊", { SH: 2, CF: 1 }]
+        ]
+      },
+      {
+        tag: "Q13 突发问题",
+        text: "遇到突发问题，比如活动现场二维码打不开，你更可能：",
+        options: [
+          ["马上找替代方案，先保证用户能继续参与", { SH: 2, IMP: 1 }],
+          ["第一时间通知相关负责人和技术/设计支持", { CO: 2, RI: 1 }],
+          ["稳住现场用户情绪，先解释和安抚", { TW: 3 }],
+          ["记录问题发生原因，避免下次再出现", { CF: 2, ME: 1 }],
+          ["会有点慌，等别人来处理", {}]
+        ]
+      },
+      {
+        tag: "Q14 反对意见",
+        text: "如果一个方案你觉得不合理，但负责人已经倾向采用，你会：",
+        options: [
+          ["直接说出风险和反对理由", { SH: 2, ME: 1 }],
+          ["用更委婉的方式提出替代建议", { TW: 2, PL: 1 }],
+          ["先执行，但保留问题记录", { IMP: 2, ME: 1 }],
+          ["找数据、案例或用户反馈来证明自己的判断", { ME: 2, RI: 1 }],
+          ["不太敢提，怕显得不配合", {}]
+        ]
+      },
+      {
+        tag: "Q15 团队印象",
+        text: "你更希望团队认为你是：",
+        options: [
+          ["交给我就放心的人", { IMP: 3 }],
+          ["能想出新办法的人", { PL: 3 }],
+          ["很会沟通、能让大家舒服协作的人", { TW: 3 }],
+          ["能推动事情往前走的人", { SH: 3 }],
+          ["很细致、能把关质量的人", { CF: 3 }],
+          ["某个领域特别专业的人", { SP: 3 }]
+        ]
+      },
+      {
+        tag: "Q16 用户群运营",
+        text: "如果让你连续两周负责用户群，你会更关注：",
+        options: [
+          ["每天有没有稳定互动和回应", { TW: 2, IMP: 1 }],
+          ["用户提出的问题有没有被整理和反馈", { IMP: 2, CO: 1 }],
+          ["能不能策划话题，让群更活跃", { PL: 2, RI: 1 }],
+          ["有没有人情绪不好或体验不佳，需要及时安抚", { TW: 3 }],
+          ["群规则、话术、SOP能不能沉淀下来", { CF: 2, IMP: 1 }]
+        ]
+      },
+      {
+        tag: "Q17 复杂资料",
+        text: "面对一份复杂资料，你通常：",
+        options: [
+          ["快速抓重点，先输出可用结论", { SH: 2, ME: 1 }],
+          ["认真读完，怕漏掉关键信息", { CF: 2, SP: 1 }],
+          ["整理成结构化表格/脑图方便团队使用", { IMP: 2, CO: 1 }],
+          ["结合自己的理解提出新的应用方向", { PL: 2, SP: 1 }],
+          ["如果没人要求，不会主动深挖", {}]
+        ]
+      },
+      {
+        tag: "Q18 发挥环境",
+        text: "你最容易在哪种情况下发挥好？",
+        options: [
+          ["目标清楚、节奏紧，有明确结果要求", { SH: 2, IMP: 1 }],
+          ["有空间发挥创意，可以尝试新方法", { PL: 3 }],
+          ["需要多方沟通协调，把人和事串起来", { CO: 2, TW: 1 }],
+          ["需要耐心维护、持续优化、长期跟进", { TW: 2, CF: 1 }],
+          ["需要专业研究、深度理解，再输出判断", { SP: 2, ME: 1 }]
+        ]
+      },
+      {
+        tag: "Q19 掉状态场景",
+        text: "你最容易在哪种情况下掉状态？",
+        options: [
+          ["目标模糊，不知道做到什么算好", { CO: 1, CF: 1 }],
+          ["一直重复，没变化也没反馈", { PL: 1, RI: 1 }],
+          ["团队没人拍板，大家互相等", { CO: 1, SH: 1 }],
+          ["事情太粗糙，明知道有问题还要交", { CF: 2 }],
+          ["人际关系太复杂，消耗太多情绪", { TW: 2 }]
+        ]
+      },
+      {
+        tag: "Q20 发展项",
+        text: "你认为自己目前最需要提升的是：",
+        options: [
+          ["主动承担和推动结果", {}],
+          ["结构化思考和总结复盘", {}],
+          ["沟通表达和跨部门协作", {}],
+          ["细节质量和交付稳定性", {}],
+          ["创意策划和用户敏感度", {}],
+          ["专业深度和判断力", {}]
+        ]
+      }
+    ];
+
+    const state = {
+      screen: "home",
+      index: 0,
+      answers: Array.from({ length: questions.length }, () => []),
+      startedAt: null,
+      timerId: null,
+      info: {}
+    };
+
+    const $ = id => document.getElementById(id);
+    const roleKeys = Object.keys(roles);
+
+    function setScreen(name) {
+      state.screen = name;
+      $("homeScreen").classList.toggle("hidden", name !== "home");
+      $("setupScreen").classList.toggle("hidden", name !== "setup");
+      $("quizScreen").classList.toggle("hidden", name !== "quiz");
+      $("reportScreen").classList.toggle("active", name === "report");
+      $("stepStart").classList.toggle("active", name === "setup" || name === "home");
+      $("stepQuiz").classList.toggle("active", name === "quiz");
+      $("stepReport").classList.toggle("active", name === "report");
+      updateSide();
+    }
+
+    function startTimer() {
+      state.startedAt = Date.now();
+      clearInterval(state.timerId);
+      state.timerId = setInterval(updateSide, 1000);
+      updateSide();
+    }
+
+    function elapsedSeconds() {
+      return state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
+    }
+
+    function fmtTime(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, "0");
+      const s = String(sec % 60).padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function updateSide() {
+      const answered = state.answers.filter(answer => answer.length > 0).length;
+      const pct = state.screen === "report" ? 100 : Math.round(answered / questions.length * 100);
+      $("sideProgress").style.width = `${pct}%`;
+      $("timer").textContent = fmtTime(elapsedSeconds());
+      $("sideStatus").textContent = state.screen === "quiz"
+        ? `已完成 ${answered}/${questions.length} 题`
+        : state.screen === "report" ? "报告已生成" : "准备开始";
+      $("quizProgress").style.width = `${Math.round((state.index + 1) / questions.length * 100)}%`;
+    }
+
+    function renderQuestion() {
+      const q = questions[state.index];
+      $("progressText").textContent = `第 ${state.index + 1} / ${questions.length} 题`;
+      $("questionTag").textContent = q.tag;
+      $("questionText").textContent = q.text;
+      $("timeText").textContent = `用时 ${fmtTime(elapsedSeconds())}`;
+      const selected = state.answers[state.index];
+      $("options").innerHTML = q.options.map((option, i) => `
+        <button class="option ${selected.includes(i) ? "selected" : ""}" data-i="${i}">
+          <b>${String.fromCharCode(65 + i)}. ${option[0]}</b>
+          <span>${selected.includes(i) ? "已选择" : "可选择 1-2 项"}</span>
+        </button>
+      `).join("");
+      $("prevBtn").disabled = state.index === 0;
+      $("nextBtn").textContent = state.index === questions.length - 1 ? "生成报告" : "下一题";
+      $("nextBtn").disabled = selected.length === 0;
+      updateSide();
+    }
+
+    function calculate() {
+      const raw = Object.fromEntries(roleKeys.map(k => [k, 0]));
+      questions.forEach((q, qi) => {
+        const answerIndexes = state.answers[qi];
+        q.options.forEach((option, oi) => {
+          Object.entries(option[1]).forEach(([role, points]) => {
+            if (answerIndexes.includes(oi)) raw[role] += points;
+          });
+        });
+      });
+      const topRaw = Math.max(...Object.values(raw), 1);
+      const scores = roleKeys.map(key => ({
+        key,
+        ...roles[key],
+        raw: raw[key],
+        score: Math.round(raw[key] / topRaw * 100)
+      })).sort((a, b) => b.raw - a.raw || b.score - a.score);
+      return scores;
+    }
+
+    function reportNarrative(top, scores) {
+      const primary = top[0];
+      const secondary = top[1];
+      const third = top[2];
+      const balance = top[0].score - top[2].score <= 10 ? "组合型" : "主导型";
+      const candidate = state.info.name || "候选人";
+      const role = state.info.role || "目标岗位";
+      const intro = `${candidate} 在 ${role} 场景下呈现 ${primary.name} 为主、${secondary.name} 与 ${third.name} 辅助的团队角色倾向。当前结果更适合作为面试假设，用行为案例继续验证。`;
+      const verdict = [
+        `主要贡献：${primary.value}`,
+        `辅助能力：${secondary.name} 带来 ${secondary.value}`,
+        `角色形态：${balance}，前三角色分差 ${top[0].score - top[2].score} 分。`
+      ];
+      const risks = [
+        `重点风险：${primary.watch}`,
+        `协作提醒：若岗位需要长期补位低分角色，要确认候选人是否愿意承担。`,
+        `验证建议：优先追问真实项目中的行为，而不是让候选人评价自己。`
+      ];
+      const probes = top.map(r => r.probe);
+      const low = scores.slice(-2).map(r => `${r.name}(${r.score})`).join("、");
+      probes.push(`低分角色为 ${low}，请确认这是岗位不需要，还是候选人短板。`);
+      return { intro, verdict, risks, probes };
+    }
+
+    function renderReport(sample = false) {
+      if (sample) {
+        state.info = { name: "示例候选人", role: "项目经理", interviewer: "面试官" };
+        state.answers = [[2,3],[0,3],[0,1],[0,1],[1,2],[0,3],[0,2],[0,1],[0,3],[0,3],[0,3],[0,3],[0,1],[0,3],[0,3],[0,1],[0,2],[0,2],[0,2],[0,2]];
+        state.startedAt = Date.now() - 238000;
+      }
+      const scores = calculate();
+      const top = scores.slice(0, 3);
+      const story = reportNarrative(top, scores);
+      const name = state.info.name || "候选人";
+      const role = state.info.role || "目标岗位";
+      $("reportMeta").textContent = `${name} / ${role} / 用时 ${fmtTime(elapsedSeconds())}`;
+      $("reportTitle").textContent = `${top[0].name} + ${top[1].name}`;
+      $("reportIntro").textContent = story.intro;
+      $("reportBadges").innerHTML = top.map(r => `<span class="badge">${r.name} ${r.score}</span>`).join("");
+      $("scoreBars").innerHTML = scores.map(r => `
+        <div class="bar">
+          <span>${r.name}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${r.score}%;background:${r.color}"></div></div>
+          <b>${r.score}</b>
+        </div>
+      `).join("");
+      $("topRoles").innerHTML = top.map((r, i) => `
+        <div class="role-card">
+          <h4>${i + 1}. ${r.name} <small>${r.en}</small></h4>
+          <p>${r.value}</p>
+          <p><b>注意：</b>${r.watch}</p>
+        </div>
+      `).join("");
+      $("verdictList").innerHTML = story.verdict.map(x => `<li>${x}</li>`).join("");
+      $("probeList").innerHTML = story.probes.map(x => `<li>${x}</li>`).join("");
+      $("riskList").innerHTML = story.risks.map(x => `<li>${x}</li>`).join("");
+      const record = buildRecord(scores, story);
+      $("copyText").textContent = record;
+      drawChart(scores);
+      setScreen("report");
+      clearInterval(state.timerId);
+      updateSide();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function buildRecord(scores, story) {
+      const top = scores.slice(0, 3).map(r => `${r.name}(${r.score})`).join(" / ");
+      const all = scores.map(r => `${r.name}${r.score}`).join("，");
+      return [
+        `Belbin 面试快测记录`,
+        `候选人：${state.info.name || "未填写"}`,
+        `岗位：${state.info.role || "未填写"}`,
+        `面试官：${state.info.interviewer || "未填写"}`,
+        `测试用时：${fmtTime(elapsedSeconds())}`,
+        `前三角色：${top}`,
+        `全部得分：${all}`,
+        `结论：${story.intro}`,
+        `风险：${story.risks.join(" ")}`,
+        `建议追问：${story.probes.join(" ")}`
+      ].join("\n");
+    }
+
+    function drawChart(scores) {
+      const canvas = $("roleChart");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const pad = 42;
+      const maxBar = w - 150;
+      ctx.font = "13px Microsoft YaHei, Arial";
+      scores.slice(0, 6).forEach((r, i) => {
+        const y = pad + i * 38;
+        ctx.fillStyle = "#3a3424";
+        ctx.fillText(r.name, 16, y + 14);
+        ctx.fillStyle = "#e9ddbd";
+        roundRect(ctx, 94, y, maxBar, 14, 7);
+        ctx.fill();
+        ctx.fillStyle = r.color;
+        roundRect(ctx, 94, y, maxBar * r.score / 100, 14, 7);
+        ctx.fill();
+        ctx.fillStyle = "#11100b";
+        ctx.fillText(String(r.score), 104 + maxBar, y + 13);
+      });
+      ctx.fillStyle = "#746f61";
+      ctx.fillText("Top 6 role scores", 16, h - 24);
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + width, y, x + width, y + height, r);
+      ctx.arcTo(x + width, y + height, x, y + height, r);
+      ctx.arcTo(x, y + height, x, y, r);
+      ctx.arcTo(x, y, x + width, y, r);
+      ctx.closePath();
+    }
+
+    $("homeStart").onclick = () => setScreen("setup");
+    $("backHome").onclick = () => setScreen("home");
+    $("sampleBtn").onclick = () => renderReport(true);
+    $("startQuiz").onclick = () => {
+      state.info = {
+        name: $("candidateName").value.trim(),
+        role: $("targetRole").value.trim(),
+        interviewer: $("interviewer").value.trim()
+      };
+      state.index = 0;
+      state.answers = Array.from({ length: questions.length }, () => []);
+      startTimer();
+      setScreen("quiz");
+      renderQuestion();
+    };
+    $("options").onclick = event => {
+      const button = event.target.closest(".option");
+      if (!button) return;
+      const optionIndex = Number(button.dataset.i);
+      const selected = state.answers[state.index];
+      if (selected.includes(optionIndex)) {
+        state.answers[state.index] = selected.filter(i => i !== optionIndex);
+      } else if (selected.length < 2) {
+        state.answers[state.index] = [...selected, optionIndex];
+      } else {
+        $("quizHint").textContent = "每题最多选择 2 项，请先取消一个已选项。";
+        return;
+      }
+      $("quizHint").textContent = "每题选择 1-2 项，按真实行为作答。";
+      renderQuestion();
+    };
+    $("prevBtn").onclick = () => {
+      if (state.index > 0) {
+        state.index -= 1;
+        renderQuestion();
+      }
+    };
+    $("nextBtn").onclick = () => {
+      if (state.answers[state.index].length === 0) return;
+      if (state.index === questions.length - 1) renderReport();
+      else {
+        state.index += 1;
+        renderQuestion();
+      }
+    };
+    $("restartBtn").onclick = () => {
+      clearInterval(state.timerId);
+      state.index = 0;
+      state.answers = Array.from({ length: questions.length }, () => []);
+      state.startedAt = null;
+      setScreen("setup");
+    };
+    $("printBtn").onclick = () => window.print();
+    $("copyBtn").onclick = async () => {
+      const text = $("copyText").textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        $("copyBtn").textContent = "已复制";
+        setTimeout(() => $("copyBtn").textContent = "复制面试记录", 1400);
+      } catch {
+        alert(text);
+      }
+    };
+
+    setScreen("home");
+  </script>
+</body>
+</html>
