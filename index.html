@@ -18,6 +18,7 @@
       --teal: #d9a51b;
       --purple: #8c6a14;
       --shadow: 0 20px 60px rgba(17, 16, 11, .18);
+      --soft-shadow: 0 10px 30px rgba(17, 16, 11, .10);
       --radius: 8px;
     }
 
@@ -26,11 +27,7 @@
     body {
       margin: 0;
       color: var(--ink);
-      background:
-        linear-gradient(180deg, rgba(17,16,11,.98) 0 300px, transparent 301px),
-        linear-gradient(135deg, rgba(245,183,0,.20), transparent 42%),
-        linear-gradient(315deg, rgba(17,16,11,.10), transparent 38%),
-        var(--paper);
+      background: linear-gradient(180deg, #11100b 0 316px, var(--paper) 317px);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
       line-height: 1.5;
     }
@@ -43,7 +40,7 @@
       position: sticky;
       top: 0;
       padding: 24px 20px;
-      background: rgba(255,250,240,.88);
+      background: linear-gradient(180deg, rgba(255,250,240,.94), rgba(255,250,240,.84));
       border-right: 1px solid var(--line);
       backdrop-filter: blur(12px);
     }
@@ -55,29 +52,31 @@
       display: grid;
       place-items: center;
       border-radius: var(--radius);
-      background: var(--ink);
+      background: linear-gradient(145deg, #11100b, #2a240f);
       color: var(--gold);
+      border: 1px solid rgba(245,183,0,.42);
+      box-shadow: 0 10px 26px rgba(17,16,11,.18);
       font-weight: 900;
     }
     .brand h1 { margin: 0; font-size: 18px; line-height: 1.15; }
     .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
 
-    .side-block { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 14px; margin-bottom: 14px; }
+    .side-block { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,250,240,.82); padding: 14px; margin-bottom: 14px; box-shadow: var(--soft-shadow); }
     .side-block strong { display: block; margin-bottom: 8px; }
     .side-block p { margin: 0; color: var(--muted); font-size: 13px; }
     .meter { height: 9px; border-radius: 999px; background: #e9ddbd; overflow: hidden; margin: 12px 0 8px; }
     .meter span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ffd84d, #f5b700, #8c6a14); transition: width .25s ease; }
     .steps { display: grid; gap: 8px; }
-    .step { display: flex; gap: 9px; align-items: center; color: var(--muted); font-size: 13px; }
-    .dot { width: 9px; height: 9px; border-radius: 50%; background: #cfc3a1; }
-    .step.active { color: var(--ink); font-weight: 800; }
+    .step { display: flex; gap: 9px; align-items: center; color: var(--muted); font-size: 13px; padding: 7px 8px; border-radius: var(--radius); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #cfc3a1; box-shadow: 0 0 0 4px rgba(207,195,161,.18); }
+    .step.active { color: var(--ink); font-weight: 800; background: rgba(245,183,0,.14); }
     .step.active .dot { background: var(--green); }
 
     .main { padding: 34px; }
     .wrap { width: min(1120px, 100%); margin: 0 auto; }
     .hidden { display: none !important; }
     .hero { min-height: calc(100vh - 68px); color: white; display: grid; align-content: center; gap: 24px; }
-    .hero h2 { margin: 0; max-width: 980px; font-size: clamp(42px, 7vw, 88px); line-height: .96; letter-spacing: 0; }
+    .hero h2 { margin: 0; max-width: 980px; font-size: clamp(40px, 6.4vw, 82px); line-height: .98; letter-spacing: 0; text-wrap: balance; }
     .hero p { margin: 0; max-width: 760px; color: rgba(255,255,255,.76); font-size: 18px; }
     .hero-line { display: flex; gap: 10px; flex-wrap: wrap; }
     .chip {
@@ -89,15 +88,28 @@
       font-size: 13px;
       font-weight: 750;
     }
+    .hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 760px; }
+    .metric {
+      border: 1px solid rgba(245,183,0,.24);
+      background: rgba(245,183,0,.08);
+      border-radius: var(--radius);
+      padding: 14px;
+      min-height: 86px;
+      display: grid;
+      align-content: space-between;
+    }
+    .metric b { color: #ffd84d; font-size: 24px; line-height: 1; }
+    .metric span { color: rgba(255,255,255,.70); font-size: 12px; }
     .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .btn {
       border: 0;
       border-radius: var(--radius);
       min-height: 44px;
       padding: 11px 16px;
-      background: var(--ink);
+      background: linear-gradient(180deg, #19160d, #070705);
       color: var(--gold);
       font-weight: 850;
+      border: 1px solid rgba(245,183,0,.42);
     }
     .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(0,0,0,.14); }
     .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
@@ -107,7 +119,7 @@
     .panel {
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: rgba(255,250,240,.96);
+      background: rgba(255,250,240,.98);
       box-shadow: var(--shadow);
     }
     .setup { padding: 24px; display: grid; gap: 20px; }
@@ -125,9 +137,10 @@
       background: var(--surface);
       color: var(--ink);
     }
+    input:focus { outline: 2px solid rgba(245,183,0,.34); border-color: #f5b700; }
 
     .quiz { overflow: hidden; }
-    .quiz-head { padding: 20px 24px; border-bottom: 1px solid var(--line); display: grid; gap: 12px; }
+    .quiz-head { padding: 20px 24px; border-bottom: 1px solid var(--line); display: grid; gap: 12px; background: linear-gradient(180deg, rgba(245,183,0,.12), transparent); }
     .quiz-row { display: flex; justify-content: space-between; gap: 14px; color: var(--muted); font-size: 13px; }
     .quiz-body { padding: 24px; }
     .tag { display: inline-flex; border-radius: 999px; padding: 6px 10px; background: rgba(245,183,0,.20); color: #6f4d08; font-size: 12px; font-weight: 850; }
@@ -140,14 +153,31 @@
       display: grid;
       align-content: start;
       gap: 6px;
+      position: relative;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--surface);
       color: var(--ink);
-      padding: 15px;
+      padding: 16px 16px 16px 58px;
+    }
+    .option::before {
+      content: attr(data-letter);
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #11100b;
+      color: #f5b700;
+      font-size: 13px;
+      font-weight: 900;
     }
     .option:hover, .option.selected { border-color: rgba(245,183,0,.85); box-shadow: 0 10px 24px rgba(140,106,20,.16); }
     .option.selected { background: #fff3bd; }
+    .option.selected::before { background: #f5b700; color: #11100b; }
     .option b { font-size: 15px; }
     .option span { color: var(--muted); font-size: 13px; }
     .quiz-foot { padding: 18px 24px; border-top: 1px solid var(--line); background: rgba(255,255,255,.55); display: flex; justify-content: space-between; gap: 12px; align-items: center; }
@@ -161,7 +191,7 @@
       gap: 16px;
       align-items: stretch;
     }
-    .summary { padding: 24px; background: linear-gradient(135deg, rgba(245,183,0,.24), transparent 52%), var(--surface); }
+    .summary { padding: 24px; background: linear-gradient(135deg, rgba(245,183,0,.24), transparent 52%), var(--surface); border-top: 4px solid #f5b700; }
     .summary h2 { margin: 6px 0 10px; font-size: clamp(30px, 4.8vw, 58px); line-height: 1; }
     .summary p { margin: 0; color: #3a3424; font-size: 16px; }
     .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
@@ -186,9 +216,11 @@
     .admin { display: none; gap: 16px; }
     .admin.active { display: grid; }
     .admin-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
-    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .admin-table th, .admin-table td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
+    .admin-table th, .admin-table td { border-bottom: 1px solid var(--line); padding: 12px 10px; text-align: left; vertical-align: top; }
     .admin-table th { color: #6f4d08; font-size: 12px; background: rgba(245,183,0,.12); }
+    .admin-table tr:last-child td { border-bottom: 0; }
     .admin-table input { width: auto; min-height: auto; }
     .team-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .empty-state { color: var(--muted); font-size: 14px; padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius); background: rgba(255,250,240,.65); }
@@ -198,7 +230,9 @@
       .rail { position: static; min-height: auto; }
       .main { padding: 20px; }
       .hero { min-height: auto; padding: 32px 0; }
-      .form-grid, .options, .report-hero, .grid-2, .role-grid, .team-summary { grid-template-columns: 1fr; }
+      .form-grid, .options, .report-hero, .grid-2, .role-grid, .team-summary, .hero-stats { grid-template-columns: 1fr; }
+      .quiz-foot { align-items: stretch; flex-direction: column; }
+      .quiz-foot .btn { width: 100%; }
     }
 
     @media print {
@@ -250,6 +284,20 @@
           </div>
           <h2>快速判断候选人在团队里自然会补哪一块。</h2>
           <p>使用你提供的 20 道工作情境题，每题可选 1-2 项，输出候选人的主导团队角色、适配岗位环境、可能短板和下一轮面试验证点。</p>
+          <div class="hero-stats">
+            <div class="metric">
+              <b>20</b>
+              <span>道面试情境题</span>
+            </div>
+            <div class="metric">
+              <b>9</b>
+              <span>类团队角色画像</span>
+            </div>
+            <div class="metric">
+              <b>1</b>
+              <span>份可复制面试记录</span>
+            </div>
+          </div>
           <div class="actions">
             <button class="btn" id="homeStart">开始快测</button>
             <button class="btn secondary" id="sampleBtn">查看示例报告</button>
@@ -260,7 +308,7 @@
           <div class="screen-title">
             <div>
               <h2>候选人信息</h2>
-              <p>这些信息只用于生成报告标题和岗位建议，本地浏览器内运行，不会上传。</p>
+              <p>用于生成报告标题、岗位建议和后台记录。完成测试后可由面试官决定是否提交到后台。</p>
             </div>
           </div>
           <div class="form-grid">
@@ -757,8 +805,8 @@
       $("timeText").textContent = `用时 ${fmtTime(elapsedSeconds())}`;
       const selected = state.answers[state.index];
       $("options").innerHTML = q.options.map((option, i) => `
-        <button class="option ${selected.includes(i) ? "selected" : ""}" data-i="${i}">
-          <b>${String.fromCharCode(65 + i)}. ${option[0]}</b>
+        <button class="option ${selected.includes(i) ? "selected" : ""}" data-i="${i}" data-letter="${String.fromCharCode(65 + i)}">
+          <b>${option[0]}</b>
           <span>${selected.includes(i) ? "已选择" : "可选择 1-2 项"}</span>
         </button>
       `).join("");
@@ -951,7 +999,7 @@
         return;
       }
       container.innerHTML = `
-        <table class="admin-table">
+        <div class="table-wrap"><table class="admin-table">
           <thead>
             <tr>
               <th>选择</th>
@@ -974,7 +1022,7 @@
               </tr>
             `).join("")}
           </tbody>
-        </table>
+        </table></div>
       `;
       container.querySelectorAll(".member-check").forEach(input => {
         input.addEventListener("change", updateSelectedTeam);
