@@ -253,7 +253,6 @@
           <div class="actions">
             <button class="btn" id="homeStart">开始快测</button>
             <button class="btn secondary" id="sampleBtn">查看示例报告</button>
-            <button class="btn secondary" id="adminEntry">进入后台</button>
           </div>
         </section>
 
@@ -706,7 +705,7 @@
       supabaseUrl: "",
       supabaseAnonKey: "",
       table: "belbin_results",
-      adminPasscode: ""
+      adminPasscode: "LDXL"
     };
 
     function setScreen(name) {
@@ -1088,7 +1087,6 @@
 
     $("homeStart").onclick = () => setScreen("setup");
     $("backHome").onclick = () => setScreen("home");
-    $("adminEntry").onclick = () => openAdmin();
     $("sampleBtn").onclick = () => renderReport(true);
     $("startQuiz").onclick = () => {
       state.info = {
