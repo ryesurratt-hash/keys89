@@ -183,13 +183,22 @@
     .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .copy-box { width: 100%; min-height: 190px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 12px; white-space: pre-wrap; color: #3a3424; font-size: 13px; }
     .print-only { display: none; }
+    .admin { display: none; gap: 16px; }
+    .admin.active { display: grid; }
+    .admin-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .admin-table th, .admin-table td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
+    .admin-table th { color: #6f4d08; font-size: 12px; background: rgba(245,183,0,.12); }
+    .admin-table input { width: auto; min-height: auto; }
+    .team-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .empty-state { color: var(--muted); font-size: 14px; padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius); background: rgba(255,250,240,.65); }
 
     @media (max-width: 900px) {
       .app { grid-template-columns: 1fr; }
       .rail { position: static; min-height: auto; }
       .main { padding: 20px; }
       .hero { min-height: auto; padding: 32px 0; }
-      .form-grid, .options, .report-hero, .grid-2, .role-grid { grid-template-columns: 1fr; }
+      .form-grid, .options, .report-hero, .grid-2, .role-grid, .team-summary { grid-template-columns: 1fr; }
     }
 
     @media print {
@@ -244,6 +253,7 @@
           <div class="actions">
             <button class="btn" id="homeStart">开始快测</button>
             <button class="btn secondary" id="sampleBtn">查看示例报告</button>
+            <button class="btn secondary" id="adminEntry">进入后台</button>
           </div>
         </section>
 
@@ -300,6 +310,7 @@
               <div class="badges" id="reportBadges"></div>
               <div class="actions no-print" style="margin-top:18px">
                 <button class="btn" id="copyBtn">复制面试记录</button>
+                <button class="btn" id="submitBtn">提交到后台</button>
                 <button class="btn secondary" id="printBtn">打印 / 导出 PDF</button>
                 <button class="btn secondary" id="restartBtn">重新测试</button>
               </div>
@@ -339,6 +350,35 @@
           <div class="panel section no-print">
             <h3>可复制记录</h3>
             <div class="copy-box" id="copyText"></div>
+          </div>
+        </section>
+
+        <section id="adminScreen" class="admin">
+          <div class="panel section">
+            <div class="admin-toolbar">
+              <div>
+                <h3>测试结果后台</h3>
+                <p style="margin:4px 0 0;color:var(--muted);font-size:13px">查看提交结果，勾选成员后生成团队角色结构分析。</p>
+              </div>
+              <div class="actions">
+                <button class="btn" id="refreshAdminBtn">刷新结果</button>
+                <button class="btn secondary" id="adminHomeBtn">返回首页</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel section">
+            <h3>候选人 / 成员列表</h3>
+            <div id="adminList"></div>
+          </div>
+          <div class="team-summary">
+            <div class="panel section">
+              <h3>团队角色分布</h3>
+              <div class="bar-list" id="teamBars"></div>
+            </div>
+            <div class="panel section">
+              <h3>团队分析</h3>
+              <ul class="list" id="teamInsights"></ul>
+            </div>
           </div>
         </section>
       </div>
@@ -653,11 +693,21 @@
       answers: Array.from({ length: questions.length }, () => []),
       startedAt: null,
       timerId: null,
-      info: {}
+      info: {},
+      latestSubmission: null,
+      adminRows: []
     };
 
     const $ = id => document.getElementById(id);
     const roleKeys = Object.keys(roles);
+    const storageKey = "belbin_interview_results_v1";
+    const backendConfig = {
+      // Leave empty for local demo mode. To collect online submissions, connect a database endpoint here.
+      supabaseUrl: "",
+      supabaseAnonKey: "",
+      table: "belbin_results",
+      adminPasscode: ""
+    };
 
     function setScreen(name) {
       state.screen = name;
@@ -665,6 +715,7 @@
       $("setupScreen").classList.toggle("hidden", name !== "setup");
       $("quizScreen").classList.toggle("hidden", name !== "quiz");
       $("reportScreen").classList.toggle("active", name === "report");
+      $("adminScreen").classList.toggle("active", name === "admin");
       $("stepStart").classList.toggle("active", name === "setup" || name === "home");
       $("stepQuiz").classList.toggle("active", name === "quiz");
       $("stepReport").classList.toggle("active", name === "report");
@@ -795,6 +846,7 @@
       $("probeList").innerHTML = story.probes.map(x => `<li>${x}</li>`).join("");
       $("riskList").innerHTML = story.risks.map(x => `<li>${x}</li>`).join("");
       const record = buildRecord(scores, story);
+      state.latestSubmission = buildSubmission(scores, story, record);
       $("copyText").textContent = record;
       drawChart(scores);
       setScreen("report");
@@ -818,6 +870,183 @@
         `风险：${story.risks.join(" ")}`,
         `建议追问：${story.probes.join(" ")}`
       ].join("\n");
+    }
+
+    function buildSubmission(scores, story, record) {
+      return {
+        id: `r_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        createdAt: new Date().toISOString(),
+        candidate: state.info.name || "未填写",
+        role: state.info.role || "未填写",
+        interviewer: state.info.interviewer || "未填写",
+        durationSeconds: elapsedSeconds(),
+        answers: state.answers,
+        scores: scores.map(r => ({ key: r.key, name: r.name, raw: r.raw, score: r.score })),
+        topRoles: scores.slice(0, 3).map(r => ({ key: r.key, name: r.name, score: r.score })),
+        intro: story.intro,
+        risks: story.risks,
+        probes: story.probes,
+        record
+      };
+    }
+
+    async function saveSubmission(submission) {
+      if (backendConfig.supabaseUrl && backendConfig.supabaseAnonKey) {
+        const url = `${backendConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${backendConfig.table}`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            apikey: backendConfig.supabaseAnonKey,
+            Authorization: `Bearer ${backendConfig.supabaseAnonKey}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation"
+          },
+          body: JSON.stringify(submission)
+        });
+        if (!response.ok) throw new Error(await response.text());
+        return response.json();
+      }
+      const rows = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      rows.unshift(submission);
+      localStorage.setItem(storageKey, JSON.stringify(rows.slice(0, 300)));
+      return submission;
+    }
+
+    async function loadSubmissions() {
+      if (backendConfig.supabaseUrl && backendConfig.supabaseAnonKey) {
+        const url = `${backendConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${backendConfig.table}?select=*&order=createdAt.desc&limit=300`;
+        const response = await fetch(url, {
+          headers: {
+            apikey: backendConfig.supabaseAnonKey,
+            Authorization: `Bearer ${backendConfig.supabaseAnonKey}`
+          }
+        });
+        if (!response.ok) throw new Error(await response.text());
+        return response.json();
+      }
+      return JSON.parse(localStorage.getItem(storageKey) || "[]");
+    }
+
+    async function openAdmin() {
+      if (backendConfig.adminPasscode) {
+        const pass = prompt("请输入后台口令");
+        if (pass !== backendConfig.adminPasscode) return;
+      }
+      setScreen("admin");
+      await renderAdmin();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function renderAdmin() {
+      const container = $("adminList");
+      container.innerHTML = `<div class="empty-state">正在读取结果...</div>`;
+      try {
+        state.adminRows = await loadSubmissions();
+      } catch (error) {
+        container.innerHTML = `<div class="empty-state">读取失败：${error.message}</div>`;
+        return;
+      }
+      if (!state.adminRows.length) {
+        container.innerHTML = `<div class="empty-state">还没有提交记录。你可以先完成一次测试并点击“提交到后台”。当前为空配置时使用本机演示数据；接上数据库后可收集线上所有提交。</div>`;
+        renderTeamAnalysis([]);
+        return;
+      }
+      container.innerHTML = `
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>选择</th>
+              <th>姓名</th>
+              <th>岗位</th>
+              <th>前三角色</th>
+              <th>用时</th>
+              <th>提交时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${state.adminRows.map(row => `
+              <tr>
+                <td><input type="checkbox" class="member-check" data-id="${row.id}" checked></td>
+                <td>${escapeHtml(row.candidate)}</td>
+                <td>${escapeHtml(row.role)}</td>
+                <td>${(row.topRoles || []).map(r => `${escapeHtml(r.name)} ${r.score}`).join(" / ")}</td>
+                <td>${fmtTime(row.durationSeconds || 0)}</td>
+                <td>${formatDate(row.createdAt)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+      container.querySelectorAll(".member-check").forEach(input => {
+        input.addEventListener("change", updateSelectedTeam);
+      });
+      updateSelectedTeam();
+    }
+
+    function updateSelectedTeam() {
+      const checkedIds = [...document.querySelectorAll(".member-check:checked")].map(input => input.dataset.id);
+      const selected = state.adminRows.filter(row => checkedIds.includes(row.id));
+      renderTeamAnalysis(selected);
+    }
+
+    function renderTeamAnalysis(rows) {
+      if (!rows.length) {
+        $("teamBars").innerHTML = `<div class="empty-state">勾选成员后生成团队角色分布。</div>`;
+        $("teamInsights").innerHTML = `<li>当前未选择成员。</li>`;
+        return;
+      }
+      const totals = Object.fromEntries(roleKeys.map(k => [k, 0]));
+      rows.forEach(row => {
+        (row.scores || []).forEach(score => {
+          totals[score.key] = (totals[score.key] || 0) + Number(score.raw || 0);
+        });
+      });
+      const max = Math.max(...Object.values(totals), 1);
+      const sorted = roleKeys.map(key => ({
+        key,
+        name: roles[key].name,
+        color: roles[key].color,
+        raw: totals[key],
+        score: Math.round(totals[key] / max * 100)
+      })).sort((a, b) => b.raw - a.raw);
+      $("teamBars").innerHTML = sorted.map(r => `
+        <div class="bar">
+          <span>${r.name}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${r.score}%;background:${r.color}"></div></div>
+          <b>${r.score}</b>
+        </div>
+      `).join("");
+      const strong = sorted.slice(0, 3).map(r => r.name).join(" / ");
+      const weak = sorted.slice(-3).map(r => r.name).join(" / ");
+      const shaper = sorted.find(r => r.key === "SH")?.score || 0;
+      const teamworker = sorted.find(r => r.key === "TW")?.score || 0;
+      const completer = sorted.find(r => r.key === "CF")?.score || 0;
+      const plant = sorted.find(r => r.key === "PL")?.score || 0;
+      const insights = [
+        `团队共选中 ${rows.length} 人，当前优势角色集中在：${strong}。`,
+        `相对薄弱角色为：${weak}，这些能力需要通过招聘、分工或流程补位。`,
+        plant >= 70 && completer < 45 ? "创意/新想法较强，但收口和质量把关偏弱，建议指定完成者或设置交付检查表。" : "",
+        shaper >= 70 && teamworker < 45 ? "推进压力较强，但凝聚/缓冲角色不足，团队高压协作时要注意冲突成本。" : "",
+        completer >= 70 && plant < 45 ? "质量把关较强，但创新角色偏弱，适合稳定交付，探索型项目需补充创意输入。" : ""
+      ].filter(Boolean);
+      $("teamInsights").innerHTML = insights.map(x => `<li>${x}</li>`).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "-";
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
     }
 
     function drawChart(scores) {
@@ -859,6 +1088,7 @@
 
     $("homeStart").onclick = () => setScreen("setup");
     $("backHome").onclick = () => setScreen("home");
+    $("adminEntry").onclick = () => openAdmin();
     $("sampleBtn").onclick = () => renderReport(true);
     $("startQuiz").onclick = () => {
       state.info = {
@@ -910,6 +1140,25 @@
       setScreen("setup");
     };
     $("printBtn").onclick = () => window.print();
+    $("submitBtn").onclick = async () => {
+      if (!state.latestSubmission) return;
+      $("submitBtn").disabled = true;
+      $("submitBtn").textContent = "提交中...";
+      try {
+        await saveSubmission(state.latestSubmission);
+        $("submitBtn").textContent = "已提交";
+      } catch (error) {
+        $("submitBtn").textContent = "提交失败";
+        alert(`提交失败：${error.message}`);
+      } finally {
+        setTimeout(() => {
+          $("submitBtn").disabled = false;
+          $("submitBtn").textContent = "提交到后台";
+        }, 1600);
+      }
+    };
+    $("refreshAdminBtn").onclick = () => renderAdmin();
+    $("adminHomeBtn").onclick = () => setScreen("home");
     $("copyBtn").onclick = async () => {
       const text = $("copyText").textContent;
       try {
@@ -921,7 +1170,8 @@
       }
     };
 
-    setScreen("home");
+    if (location.hash === "#admin") openAdmin();
+    else setScreen("home");
   </script>
 </body>
 </html>
